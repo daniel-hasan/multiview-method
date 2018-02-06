@@ -13,14 +13,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import banco.GerenteBD;
 import matematica.KendallTau;
-
 import stuctUtil.ItemPerThread;
 import stuctUtil.ListaAssociativa;
 import stuctUtil.Tupla;
-import banco.GerenteBD;
 
-import com.mysql.jdbc.NotImplemented;
 
 
 
@@ -733,16 +731,6 @@ public class ResultadoItem implements Comparable<ResultadoItem>, Serializable
 			}
 			
 		}
-		
-	}
-	
-	public static boolean existResultado(String nomExperimento) throws NotImplemented
-	{
-		Long idCurrentThread = Thread.currentThread().getId();
-		//stmtExisteResultadoPool.put(idCurrentThread, conn.prepareStatement("select 1 from wiki_results.resultado_regressao where nomExperimento = ? limit 1"));
-		throw new NotImplemented();
-		
-		
 		
 	}
 

@@ -13,7 +13,8 @@ view_3_idx_range=5
 
 withFeatSet = false
 justBaseLevel = false
-
+#output result
+output=result.txt
 
 #machine learning type (classification, regression or l2r)
 mlMode = regression

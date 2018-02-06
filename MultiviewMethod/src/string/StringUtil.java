@@ -1,6 +1,5 @@
 package string;
 
-import info.bliki.wiki.dump.WikiArticle;
 import io.Sys;
 
 import java.io.BufferedReader;
@@ -16,7 +15,7 @@ import java.util.regex.Pattern;
 
 import stuctUtil.Tupla;
 import wikiUtil.WikiUtil;
-
+ 
 /*
  * Created on 05/07/2007
  *
@@ -30,46 +29,14 @@ import wikiUtil.WikiUtil;
  * Preferences - Java - Code Style - Code Templates
  */
 public class StringUtil {
-	private static String END_STOP_WORDS = "/home/hasan/data/dumps/stopWords.csv";
+
 	//private static String END_STOP_WORDS = "/home/curupira/hasan/stopWords.csv";
-	private static String[] stopWords= carregaStopWords();
 	public static final String APENAS_ACENTOS = ((char)225)+"-"+((char)250);
 	public static Pattern objPatternStopWord;
 	private static Pattern objPonctuation;
 	private static HashMap<String,Boolean> mapWords = new HashMap<String, Boolean>();
-	public static String[] stemmAndRemoveStopWords(String text)
-	{
 
-		
-				
-		
-		//retira espaços em brandco duplicados 
-		while(text.contains("  "))
-		{
-			text = text.replaceAll("  ", " ");
-		}
-		
-		//remove stopwords
-		//carregaStopWords();
-		text = retiraStopWords(text.split(" ")).trim();
-		
-		
-		String[] words = stemmText(text);
-		
 
-		return words;
-	
-	}
-	public static String stemmAndRemoveStopWordsString(String text)
-	{
-		String strText = "";
-		for(String termo : stemmAndRemoveStopWords(text))
-		{
-			strText += termo+" ";
-		}
-		return strText.trim();
-	
-	}
 	/**
 	 * Retorna o texto sem os blocoscom a tag inicioTag e uma lista com os blocos retirados
 	 * @param texto
@@ -171,32 +138,7 @@ public class StringUtil {
 		}
 		return strText;
 	}
-	public static String[] stemmText(String text) {
 
-		
-		//stem
-		Stemmer s = new Stemmer();
-		String[] words = text.split(" ");
-		List<String> lstWordsSteamed = new ArrayList<String>();
-		StringBuilder textStemmed = new StringBuilder();
-
-		for(String word : words)
-		{
-			if(word.length() > 0)
-			{
-				s.add(word.toLowerCase().toCharArray(), word.length());
-				s.stem();
-				lstWordsSteamed.add(s.toString());
-			}
-		}
-		String[] wdsStemmed = new String[lstWordsSteamed.size()];
-		for(int i = 0; i< lstWordsSteamed.size() ; i++)
-		{
-			wdsStemmed[i] = lstWordsSteamed.get(i);
-		}
-		return wdsStemmed;
-	}
-	
 	
 	/**
 	 * Returns the substring which is the prefix of the both strings
@@ -264,104 +206,8 @@ public class StringUtil {
 		}
 		return i;
 	}
-	public static String retiraStopWords(String text) 
-	{
-		
-		
-		for(int i =0 ;i<stopWords.length; i++)
-		{
-			text = Pattern.compile("[^a-z]"+stopWords[i]+"[^a-z]",Pattern.CASE_INSENSITIVE).matcher(text).replaceAll(" ");
-		}
-		
-		
-		
+	
 
-		
-		
-		//text = objPatternStopWord.matcher(text).replaceAll(" ");
-		return text;
-
-	}
-	public static String retiraStopWordsAndPonctuation(String text) 
-	{
-
-		String[] arrPalavras = removePonctuation(text).split(" ");
-		
-		String strString = retiraStopWords(arrPalavras);
-		return StringUtil.removeDoubleSpace(strString);
-	}
-	public static boolean isStopWord(String palavra)
-	{
-		if(mapWords.size() == 0)
-		{
-			carregaStopWords();
-		}
-		return mapWords.containsKey(palavra.toUpperCase()); 
-	}
-
-	public static String retiraStopWords(String[] arrPalavras) {
-		if(mapWords.size() == 0)
-		{
-			carregaStopWords();
-		}
-		StringBuilder strString = new StringBuilder();
-		for(String palavra : arrPalavras)
-		{
-			if(!mapWords.containsKey(palavra.toUpperCase()))
-			{
-				strString.append(palavra+" ");
-			}
-		}
-		String str = strString.toString().replaceAll("('|’)(s|t)", "");
-		return str;
-	}
-	public static String[] carregaStopWords()
-	{
-		try
-		{
-			BufferedReader r = new BufferedReader(new FileReader(new File(END_STOP_WORDS)));
-			String listaPalavras = "";
-			String linha;
-			while((linha = r.readLine())!=null)
-			{
-				listaPalavras += linha.replaceAll(" ","");
-			}
-			r.close();
-			
-			
-			
-			//faz uma expressao regular com todas as stopwords
-			String[] arrPalavras = listaPalavras.split(",");
-			StringBuilder strRegExp = new StringBuilder();
-			mapWords = new HashMap<String, Boolean>();
-			for(int i =0 ;i<arrPalavras.length; i++)
-			{
-				strRegExp.append("("+arrPalavras[i]+")");
-				if(i<arrPalavras.length-1)
-				{
-					strRegExp.append("|");	
-				}
-				mapWords.put(arrPalavras[i].toUpperCase(),true);
-				
-			}
-			objPatternStopWord = Pattern.compile("[^a-z]("+strRegExp.toString()+")[^a-z]",Pattern.CASE_INSENSITIVE);
-			
-			
-			return listaPalavras.split(",");
-		} catch (FileNotFoundException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			
-		} catch (IOException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-
-		return null;
-	}
 	private static HashMap<String,Character> mapStringHtml = new HashMap<String,Character>();
 	
 	static{ 
@@ -1267,42 +1113,6 @@ System.out.println(lst);
 	
 	StringBuilder text = new StringBuilder("The m&#x40;rk Stewart W&Agrave;tson (born September 8, 1970 in Vancouver, British Columbia) is a professional soccer player who has earned the second most caps in the history of the Canadian national team. Watson currently plays for the Charleston Battery of the USL First Division. He joined the Battery in 2006, after his third stint with the Vancouver Whitecaps, having played 10 games for the 86ers in the summer of 1993 when he was named an APSL First Team All Star, and 9 games in 1994.");
 	
-	
-	
-	//System.out.println("NUM:"+countOccorencias("tigre tres pratos de tigres para tres tigres tristes","tigre"));
-	
-	//System.exit(0);
-	/*
-	for(int i =0 ; i<15 ; i++)
-	{
-		text.append(" "+text.toString()+" ");
-	}
-	*/
-	String strText = text.toString();
-	System.out.println("Texto1: "+htmlToText(strText));
-	System.out.println("Texto2: "+ accentsHtmlToText(strText));
-	
-	System.out.print("Stemming: ");
-	String[] words = stemmAndRemoveStopWords(text.toString());
-	for(String word : words)
-	{
-		System.out.print(word+" ");
-	}
-	System.out.println();
-	System.exit(0);
-	//System.out.println(text);
-	carregaStopWords();
-	System.out.println("tamanho: "+text.length());
-	 
-	for(int i =0 ; i<2 ; i++)
-	{
-		Long time = System.currentTimeMillis();
-		//strText = retiraStopWords(strText);
-		strText = retiraStopWordsAndPonctuation(strText);
-		System.out.println("tamanho: "+strText.length()+" tempo: "+(System.currentTimeMillis()-time)/1000.0+" %Men livre:"+Sys.getPorcentMemLivre());
-		System.out.println("StopWords removed: "+strText);
-	}
-	strText = removePonctuation(strText);
-	System.out.println("Removing pontuation: "+strText.length());
+
 }
 }

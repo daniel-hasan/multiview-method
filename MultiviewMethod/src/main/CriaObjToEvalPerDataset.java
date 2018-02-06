@@ -253,7 +253,7 @@ public class CriaObjToEvalPerDataset {
 								Map<String, String> mapParamTrain, Map<String, String> mapParamTest, File featureSetupCache, boolean use_cache,
 								Integer[] arrFeatures, 
 								ML_MODE mlMode, String mlMethod,
-								boolean withFeatSet,boolean justBase,int numSubfoldsTreino) throws Exception {
+								boolean withFeatSet,boolean justBase,int numSubfoldsTreino, File output) throws Exception {
 		MetodoAprendizado met = null;
 		
 		if(mlMode == ML_MODE.L2R) {
@@ -262,7 +262,6 @@ public class CriaObjToEvalPerDataset {
 			met = new GenericoSVMLike(mlMethod,mapParamTrain,mapParamTest);
 			if(mlMode == ML_MODE.REGRESSION) {
 				((GenericoSVMLike)met).setMode(SVM.MODE_REGRESSION);
-				
 			}else {
 				((GenericoSVMLike)met).setMode(SVM.MODE_CLASSIFICATION);
 			}
@@ -285,14 +284,15 @@ public class CriaObjToEvalPerDataset {
 		
 		//run and present the result
 		long time = System.currentTimeMillis();
-		System.out.println("Result: "+FeatureSelectionHelper.getResultadoConfigView(featureSetupCache,arrFeatures,new FitnessCalculator(),withFeatSet,justBase, new File("/home/profhasan/wiki.out"),mlMode));
+		System.out.println("Result: "+FeatureSelectionHelper.getResultadoConfigView(featureSetupCache,arrFeatures,new FitnessCalculator(),withFeatSet,justBase, 
+				output,mlMode));
 		System.out.println("Time (just the evaluation): "+(System.currentTimeMillis()-time)/1000.0+" segundos");
 	}
 	public static void main(String[] args) throws Exception
 	{
 		args = new String[3];
-		String dirFile = "/home/profhasan/git/multiview/toyExample";
-		String dirCnf = "/home/profhasan/git/multiview";
+		String dirFile = "/home/hasan/git/multiview-method/toyExample";
+		String dirCnf = "/home/hasan/git/multiview-method";
 		args[0] = dirFile+"/train_svm.txt";
 		args[1] = dirFile+"/test_svm.txt";
 		args[2] = dirCnf+"/configExample.cnf";
@@ -336,6 +336,7 @@ public class CriaObjToEvalPerDataset {
 		Map<String,String> mapParamTrain = getParamsMLMethod(mapConfigFileCaseSensitive,"ml_param_train_");
 		Map<String,String> mapParamTest = getParamsMLMethod(mapConfigFileCaseSensitive,"ml_param_test_");
 		
+		File output = new File(mapConfigFile.getOrDefault("output","output.txt"));
 		//print the config
 		System.out.println("You are running multiview with the following configuration:");
 		System.out.println("Machine learning tools path:"+pathMLTools);
@@ -350,6 +351,7 @@ public class CriaObjToEvalPerDataset {
 		System.out.println("Use just first level?"+justBase);
 		System.out.println("Training params: "+mapParamTrain);
 		System.out.println("Test params: "+mapParamTest);
+		System.out.println("Output: "+output.getAbsolutePath());
 		GenericoSVMLike.xmlMetodoCnf = new XMLMetodoAprendizado(new File(strXmlMachineLearningMethods));
 		
 		StringBuffer str = new StringBuffer();
@@ -374,7 +376,7 @@ public class CriaObjToEvalPerDataset {
 		//run multiview
 		GenericoSVMLike.PATH_TOOLS = new File(pathMLTools).getAbsolutePath();
 		//System.exit(0);
-		multiview(train,test,mapParamTrain,mapParamTest,featSetfile,use_cache,arrFeatures,mlMode,mlMethod,withFeatSet,justBase,intNumSubFolds);
+		multiview(train,test,mapParamTrain,mapParamTest,featSetfile,use_cache,arrFeatures,mlMode,mlMethod,withFeatSet,justBase,intNumSubFolds,output);
 		
 		
 		//CriaObjToEvalPerDataset c = new CriaObjToEvalPerDataset();

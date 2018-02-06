@@ -594,15 +594,17 @@ public class CalculaResultados {
 		//confianca
 		if(arqResult != null)
 		{
-			Confianca mseConfianca = getMseConfiancaArquivo(folds,nomExperimento,arqResult.getParentFile());
+			/*
+			Confianca mseConfianca = getMseConfiancaArquivo(folds,nomExperimento,arqResult.getParentFile()!=null?arqResult.getParentFile():new File(""));
 			double[] intConfiancaMSE = mseConfianca.calculaIntervalo(Confianca.Z.C_090);
 			double[] intConfiancaTempo = tempoConfianca.calculaIntervalo(Confianca.T.T_090);
 			result += "\nMédia MSE:"+mseConfianca.getMedia()+" Int. Confianca MSE: ["+intConfiancaMSE[0]+","+intConfiancaMSE[1]+"]";
 			result += "\nMédia Tempo:"+tempoConfianca.getMedia()+"ms Int. Confianca Tempo: ["+intConfiancaTempo[0]+","+intConfiancaTempo[1]+"]";
+			*/
 		}
 
-		result += "\nMSE Total médio: "+getMSE(folds);
-		result += "\nTotal de instancias: "+totalInstancias;
+		result += "\nMSE: "+getMSE(folds);
+		result += "\n# of itens: "+totalInstancias;
 		
 		return result;
 	}

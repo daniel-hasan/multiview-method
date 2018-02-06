@@ -29,6 +29,7 @@ import arquivo.ArquivoUtil;
 import arquivo.TempFiles;
 import entidadesAprendizado.Fold;
 import entidadesAprendizado.Resultado;
+import entidadesAprendizado.ResultadoItem;
 import entidadesAprendizado.ResultadoViews;
 import entidadesAprendizado.View;
 import entidadesAprendizado.View.FeatureType;
@@ -460,6 +461,7 @@ public class FeatureSelectionHelper implements Serializable,ViewCreatorHelper
 				
 				Combinador cmb = new Combinador("combinacao_"+UUID.randomUUID(), mt, arrViews,rv);
 				Resultado r = cmb.executaCombinacao("combinacao_"+UUID.randomUUID(), arrViews,false);
+				r.setView(arrViews);
 				
 				System.out.println("Tempo de execucao comvbinacao: "+(System.currentTimeMillis()-time)/1000.0);
 				
@@ -468,6 +470,7 @@ public class FeatureSelectionHelper implements Serializable,ViewCreatorHelper
 					dirViews.deleteOnExit();
 					TempFiles.getTempFiles().addFile(dirViews);
 				}
+				
 				return r;
 			}else
 			{
@@ -1326,15 +1329,44 @@ public class FeatureSelectionHelper implements Serializable,ViewCreatorHelper
 		 fr.setRunJustBase(justBase);
 		 
 		 Resultado r = fr.retornaFoldsFiltrado(arrFiltro);
+		 Resultado[] resultTesteView =  new Resultado[r.getViews().length];
+		for(int i = 0; i<r.getViews().length ; i++){
+			resultTesteView[i] = r.getViews()[i].getResultTeste();
+		}
+		 
 		 switch(mlMode) {
 			 case CLASSIFICATION:
-				 System.out.println(CalculaResultados.resultadoClassificacaoToString(r, 6, output));
+				 //verifica a quantidade de classes do resultado
+				 int maxClass = 0;
+				 for(Fold f : r.getFolds()){
+					 for(ResultadoItem ri : f.getResultadosValues()){
+						 if(maxClass > ri.getClasseReal()){
+							 maxClass = (int) ri.getClasseReal();
+						 }
+					 }
+				 }
+				 System.out.println("========================= Per view Result ========================");
+				 for(int i = 0 ; i<resultTesteView.length ; i++){
+					 System.out.println("==============================");
+					 System.out.println("VIEW: "+r.getViews()[i].toString());
+					 System.out.println(CalculaResultados.resultadoClassificacaoToString(resultTesteView[i], maxClass, new File(output.getAbsolutePath()+"_view"+r.getViews()[i].getSglView())));
+				 }
+				 System.out.println("====================== Final Result ==============================");
+				 System.out.println(CalculaResultados.resultadoClassificacaoToString(r, maxClass, output));
+				 
 				 break;
 			 case REGRESSION:
+				 System.out.println("========================= Per view Result ========================");
+				 for(int i = 0 ; i<resultTesteView.length ; i++){
+					 System.out.println("VIEW: "+r.getViews()[i]);
+					 System.out.println(CalculaResultados.resultadoRegressaoToString(resultTesteView[i], output));
+				 }
+				 System.out.println("====================== Final Result ==============================");
 				 System.out.println(CalculaResultados.resultadoRegressaoToString(r, output));
 				 break;
 		 }
-
+		//grava resultados no output
+		
 		return FitnessCalculator.getResultado(fr.getMetodoCombinacao(), r,0.0,null);
 		 
 		 

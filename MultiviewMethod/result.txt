@@ -1,0 +1,144 @@
+
+
+
+================================================================
+Experimento: combinacao_7cdd396d-dfc3-4af2-a7de-feda7e672ffa
+
+
+*****FOLDS MSE e Tempo de execução****
+#0	
+0.0	
+0.0s	
+
+MSE: 0.0
+# of itens: 8
+
+
+================================================================
+Experimento: train_svm.txt
+
+
+*****FOLDS MSE e Tempo de execução****
+#0	
+0.5	
+0.0s	
+
+MSE: 0.5
+# of itens: 8
+
+
+================================================================
+Experimento: train_svm.txt
+
+
+*****FOLDS MSE e Tempo de execução****
+#0	
+0.0	
+0.0s	
+
+MSE: 0.0
+# of itens: 8
+
+
+================================================================
+Experimento: train_svm.txt
+
+
+*****FOLDS MSE e Tempo de execução****
+#0	
+0.0	
+0.0s	
+
+MSE: 0.0
+# of itens: 8
+
+
+================================================================
+Experimento: combinacao_6e0edc79-1894-4ea3-a72c-67b254d81730
+
+
+*****FOLDS MSE e Tempo de execução****
+#0	
+0.0	
+0.0s	
+
+MSE: 0.0
+# of itens: 8
+
+
+================================================================
+Experimento: train_svm.txt
+
+
+*****FOLDS MSE e Tempo de execução****
+#0	
+0.5	
+0.0s	
+
+MSE: 0.5
+# of itens: 8
+
+
+================================================================
+Experimento: train_svm.txt
+
+
+*****FOLDS MSE e Tempo de execução****
+#0	
+0.0	
+0.0s	
+
+MSE: 0.0
+# of itens: 8
+
+
+================================================================
+Experimento: train_svm.txt
+
+
+*****FOLDS MSE e Tempo de execução****
+#0	
+0.5	
+0.0s	
+
+MSE: 0.5
+# of itens: 8
+
+
+================================================================
+Experimento: train_svm.txt
+
+
+*****FOLDS MSE e Tempo de execução****
+#0	
+0.0	
+0.0s	
+
+MSE: 0.0
+# of itens: 8
+
+
+================================================================
+Experimento: train_svm.txt
+
+
+*****FOLDS MSE e Tempo de execução****
+#0	
+0.0	
+0.0s	
+
+MSE: 0.0
+# of itens: 8
+
+
+================================================================
+Experimento: combinacao_fbef1b08-edb8-485c-9d4b-5a6e11fcd71c
+
+
+*****FOLDS MSE e Tempo de execução****
+#0	
+0.0	
+0.0s	
+
+MSE: 0.0
+# of itens: 8
