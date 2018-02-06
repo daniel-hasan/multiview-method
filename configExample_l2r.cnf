@@ -1,0 +1,22 @@
+featureSetCacheFile = cache_feature_set.obj
+useCache = false
+
+mlToolsPath = ../ml_tools/ 
+
+view_1_idx_range=1-2
+view_2_idx_range=3-4
+view_3_idx_range=5-6
+#its similar to:
+#viewPerFeature = 1,1,2,2,3,3
+#In viewPerFeature, use "0" if there is no view assigned to a determined feature
+
+
+withFeatSet = false
+justBaseLevel = false
+
+xmlMachineLearningMethods = learning_methods.xml
+
+#machine learning type (classification, regression or l2r)
+mlMode = l2r
+#usage the ml name contained in the xml file (xmlMachineLearningMethods)
+mlMethod = SVMRank

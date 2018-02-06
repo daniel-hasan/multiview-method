@@ -1,0 +1,33 @@
+featureSetCacheFile = cache_feature_set.obj
+useCache = false
+
+mlToolsPath = ../ml_tools/ 
+
+view_1_idx_range=1-2
+view_2_idx_range=3-4
+view_3_idx_range=5
+#its similar to:
+#viewPerFeature = 1,1,2,2,3
+#In viewPerFeature, use "0" if there is no view assigned to a determined feature
+
+
+withFeatSet = false
+justBaseLevel = false
+
+
+#machine learning type (classification, regression or l2r)
+mlMode = regression
+
+#XML containing the machine learning methods scripts
+xmlMachineLearningMethods = learning_methods.xml
+
+#usage the ml name contained in the xml file (xmlMachineLearningMethods)
+mlMethod = SVM
+
+#set the parameters of the machine learning method (* to make a gridsearch - according to the XML file) in the training and test set. Use the prefix "ml_param_train_" for the training set params and "ml_pram_test_" for the test params
+ml_param_train_COST = *
+ml_param_train_GAMA = *
+
+
+
+
