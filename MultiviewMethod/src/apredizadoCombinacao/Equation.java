@@ -112,9 +112,9 @@ public class Equation extends AbordagemCombinacao
     
         confusionMatrix.novaPredicao((int) Math.round(pred), (int) Math.round(values.get(0).getClasseReal()));
         
-        ResultadoItem result = new ResultadoItem(values.get(0).getId(),
-                (float) values.get(0).getClasseReal(), pred, null);
-        return result;
+        /*ResultadoItem result = new ResultadoItem(values.get(0).getId(),
+                (float) values.get(0).getClasseReal(), pred, null);*/
+        return null;
     }
 
     /**

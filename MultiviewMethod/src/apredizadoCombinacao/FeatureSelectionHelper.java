@@ -1316,7 +1316,7 @@ public class FeatureSelectionHelper implements Serializable,ViewCreatorHelper
 	 public static double getResultadoConfigView(File arqIndexadorFeatHelper,Integer[] arrFiltro,FitnessCalculator fc,boolean featSet,boolean justBase) throws Exception{
 		 return getResultadoConfigView( arqIndexadorFeatHelper, arrFiltro, fc, featSet, justBase, new File("/home/profhasan/wikiTest.out"), ML_MODE.CLASSIFICATION);
 	 }
-	 public static double getResultadoConfigView(File arqIndexadorFeatHelper,Integer[] arrFiltro,FitnessCalculator fc,boolean featSet,boolean justBase,File output, ML_MODE mlMode) throws Exception
+	 public static double getResultadoConfigView(File arqIndexadorFeatHelper,Integer[] arrFiltro,FitnessCalculator fc,boolean featSet,boolean justBase,File outputDir, ML_MODE mlMode) throws Exception
 	 {
 		 long time = System.currentTimeMillis();
 		 FeatureSelectionHelper fr = (FeatureSelectionHelper)ArquivoUtil.leObject(arqIndexadorFeatHelper);
@@ -1333,36 +1333,53 @@ public class FeatureSelectionHelper implements Serializable,ViewCreatorHelper
 		for(int i = 0; i<r.getViews().length ; i++){
 			resultTesteView[i] = r.getViews()[i].getResultTeste();
 		}
-		 
+		if(!outputDir.exists()) {
+			outputDir.mkdirs();
+		}
 		 switch(mlMode) {
 			 case CLASSIFICATION:
 				 //verifica a quantidade de classes do resultado
 				 int maxClass = 0;
-				 for(Fold f : r.getFolds()){
+				 File[] finalResulPath = new File[r.getFolds().length];
+				 for(int i =0 ; i<r.getFolds().length; i++){
+					 Fold f = r.getFolds()[i];
 					 for(ResultadoItem ri : f.getResultadosValues()){
 						 if(maxClass > ri.getClasseReal()){
 							 maxClass = (int) ri.getClasseReal();
 						 }
 					 }
+					 //move o predict do fold para a pasta de resultado
+					 finalResulPath[i] = new File(outputDir,"final_result.predict");
+					 ArquivoUtil.copyfile(f.getPredict(), finalResulPath[i]); 
 				 }
 				 System.out.println("========================= Per view Result ========================");
 				 for(int i = 0 ; i<resultTesteView.length ; i++){
 					 System.out.println("==============================");
 					 System.out.println("VIEW: "+r.getViews()[i].toString());
-					 System.out.println(CalculaResultados.resultadoClassificacaoToString(resultTesteView[i], maxClass, new File(output.getAbsolutePath()+"_view"+r.getViews()[i].getSglView())));
+					 System.out.println(CalculaResultados.resultadoClassificacaoToString(resultTesteView[i], maxClass, new File(outputDir,"result_"+r.getViews()[i].toString()+".txt")));
+					 //grava predict de cada visao
+					 for(int j = 0; j<resultTesteView[i].getFolds().length ; j++) {
+						 Fold f = resultTesteView[i].getFolds()[j];
+						 File fViewResult = new File(outputDir,"result_"+r.getViews()[i].toString()+".predict");
+						 ArquivoUtil.copyfile(f.getPredict(), fViewResult);  
+						 System.out.println(" predicts output file:"+finalResulPath[i].getAbsolutePath() );
+					 }
 				 }
 				 System.out.println("====================== Final Result ==============================");
-				 System.out.println(CalculaResultados.resultadoClassificacaoToString(r, maxClass, output));
-				 
+				 System.out.println(CalculaResultados.resultadoClassificacaoToString(r, maxClass, new File(outputDir,"final_result.txt")));
+				 for(int i =0; i<finalResulPath.length; i++) {
+					 System.out.println("Final predicts output file:"+finalResulPath[i].getAbsolutePath() );
+				 }
 				 break;
 			 case REGRESSION:
 				 System.out.println("========================= Per view Result ========================");
 				 for(int i = 0 ; i<resultTesteView.length ; i++){
-					 System.out.println("VIEW: "+r.getViews()[i]);
-					 System.out.println(CalculaResultados.resultadoRegressaoToString(resultTesteView[i], output));
+					 System.out.println("VIEW: "+r.getViews()[i].toString());
+					 System.out.println(CalculaResultados.resultadoRegressaoToString(resultTesteView[i], new File(outputDir,"result_"+r.getViews()[i].getSglView()+".txt")));
 				 }
+				 
 				 System.out.println("====================== Final Result ==============================");
-				 System.out.println(CalculaResultados.resultadoRegressaoToString(r, output));
+				 System.out.println(CalculaResultados.resultadoRegressaoToString(r, new File(outputDir,"result_final.txt")));
 				 break;
 		 }
 		//grava resultados no output

@@ -24,7 +24,6 @@ import stuctUtil.Tupla;
 public class CriaObjToEvalPerDataset {
 	public static void defineFoldIds(MetodoAprendizado metAp,FeatureSelectionHelper fHelper,List<Long> treino,List<Long> teste,int numSubFoldsTreino) throws Exception
 	{
-		
 		int[] numSubFoldsPerFold=null;
 		
 		List<Long>[] idsSubFoldsTreino = Fold.divideIntoFolds(numSubFoldsTreino, treino,Fold.SEED_DEFAULT);;
@@ -253,7 +252,7 @@ public class CriaObjToEvalPerDataset {
 								Map<String, String> mapParamTrain, Map<String, String> mapParamTest, File featureSetupCache, boolean use_cache,
 								Integer[] arrFeatures, 
 								ML_MODE mlMode, String mlMethod,
-								boolean withFeatSet,boolean justBase,int numSubfoldsTreino, File output) throws Exception {
+								boolean withFeatSet,boolean justBase,int numSubfoldsTreino, File outputDir) throws Exception {
 		MetodoAprendizado met = null;
 		
 		if(mlMode == ML_MODE.L2R) {
@@ -285,7 +284,7 @@ public class CriaObjToEvalPerDataset {
 		//run and present the result
 		long time = System.currentTimeMillis();
 		System.out.println("Result: "+FeatureSelectionHelper.getResultadoConfigView(featureSetupCache,arrFeatures,new FitnessCalculator(),withFeatSet,justBase, 
-				output,mlMode));
+				outputDir,mlMode));
 		System.out.println("Time (just the evaluation): "+(System.currentTimeMillis()-time)/1000.0+" segundos");
 	}
 	public static void main(String[] args) throws Exception
@@ -336,7 +335,7 @@ public class CriaObjToEvalPerDataset {
 		Map<String,String> mapParamTrain = getParamsMLMethod(mapConfigFileCaseSensitive,"ml_param_train_");
 		Map<String,String> mapParamTest = getParamsMLMethod(mapConfigFileCaseSensitive,"ml_param_test_");
 		
-		File output = new File(mapConfigFile.getOrDefault("output","output.txt"));
+		File output = new File(mapConfigFile.getOrDefault("outputdir","output"));
 		//print the config
 		System.out.println("You are running multiview with the following configuration:");
 		System.out.println("Machine learning tools path:"+pathMLTools);
@@ -351,7 +350,7 @@ public class CriaObjToEvalPerDataset {
 		System.out.println("Use just first level?"+justBase);
 		System.out.println("Training params: "+mapParamTrain);
 		System.out.println("Test params: "+mapParamTest);
-		System.out.println("Output: "+output.getAbsolutePath());
+		System.out.println("Output dir: "+output.getAbsolutePath());
 		GenericoSVMLike.xmlMetodoCnf = new XMLMetodoAprendizado(new File(strXmlMachineLearningMethods));
 		
 		StringBuffer str = new StringBuffer();
