@@ -283,18 +283,13 @@ public class CriaObjToEvalPerDataset {
 		
 		//run and present the result
 		long time = System.currentTimeMillis();
-		System.out.println("Result: "+FeatureSelectionHelper.getResultadoConfigView(featureSetupCache,arrFeatures,new FitnessCalculator(),withFeatSet,justBase, 
-				outputDir,mlMode));
+		FeatureSelectionHelper.getResultadoConfigView(featureSetupCache,arrFeatures,new FitnessCalculator(),withFeatSet,justBase, 
+				outputDir,mlMode,fileTest);
 		System.out.println("Time (just the evaluation): "+(System.currentTimeMillis()-time)/1000.0+" segundos");
 	}
 	public static void main(String[] args) throws Exception
 	{
-		args = new String[3];
-		String dirFile = "/home/hasan/git/multiview-method/toyExample";
-		String dirCnf = "/home/hasan/git/multiview-method";
-		args[0] = dirFile+"/train_svm.txt";
-		args[1] = dirFile+"/test_svm.txt";
-		args[2] = dirCnf+"/configExample.cnf";
+		
 		if(args.length<2) {
 			System.out.println("Usage java -jar multiview.jar <train-file> <test-file> <config-file>");
 			return;

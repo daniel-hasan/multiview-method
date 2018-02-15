@@ -43,7 +43,7 @@ public class Sys
 
 	public static String executarComando(String cmd,boolean onlyLastLine,String diretorio,String textToWrite,boolean EXIBIR_ERRO) throws IOException
 	{
-		//System.out.println(cmd+" (@"+diretorio+")");
+		System.out.println(cmd+" (@"+diretorio+")");
 	
 		String line;
 		 

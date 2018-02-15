@@ -1,0 +1,12 @@
+Confusion Matrix
+Target Class (lines) Predicted Class (columns):
+	2	1
+2	4	0	
+1	1	3	
+
+Hits: 7/8 (87.5%)
+Macro F1: 0.873015873015873
+Macro F1 per class:{0=0.888888888888889, 1=0.8571428571428571}
+
+Macro F1: 0.873015873015873
+Acuracy: 87.5

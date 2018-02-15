@@ -419,7 +419,7 @@ public abstract class MetodoAprendizado implements Serializable
 		{
 			for(int i = 0; i<folds.length ; i++)
 			{
-				System.out.println("Testando fold#"+i);
+				//System.out.println("Testando fold#"+i);
 				long tempo = System.currentTimeMillis();
 				
 				folds[i].setResultados(testar(folds[i]));

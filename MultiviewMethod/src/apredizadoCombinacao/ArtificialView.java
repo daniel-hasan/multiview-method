@@ -251,7 +251,7 @@ public class ArtificialView extends View {
 				//tenta rodar com o melhor anterior
 				Tupla<Map<String,String>,Map<String,String>> mapParamNew = lstParamOrederedPerBestResult.get(0).getX();
 				metAp = new GenericoLetorLike(((GenericoSVMLike)metAp).getNomeMetodo(),mapParamNew.getX(),mapParamNew.getY());
-				((GenericoSVMLike)metAp).setTimeout(30000);
+				((GenericoSVMLike)metAp).setTimeout(300000000);
 				
 				//limpa os resultados dos folds (se existiu)
 				for(Fold f : arrFolds)
@@ -294,7 +294,9 @@ public class ArtificialView extends View {
 					time = System.currentTimeMillis();
 					//aplica no teste do fold 0
 					f.setTreino(subFold.getTreino());
+					//f.setPredict(f.getTeste());
 					fTreino.setTreino(subFold.getTreino());
+					//System.out.println("*** Testando view **");
 					ArrayList<ResultadoItem> lstResults = metAp.testar(f);
 					f.setResultados(lstResults);
 					

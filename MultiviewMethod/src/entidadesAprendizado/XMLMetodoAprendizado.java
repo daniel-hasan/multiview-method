@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.xerces.parsers.DOMParser;
 import org.w3c.dom.Document;
@@ -58,7 +59,9 @@ public class XMLMetodoAprendizado
     	
     	return new Tupla<String,List<Param>>(script,Param.createParam(params, cnfParams));
 	}
-	
+	public Set<String> getCNFMetodoNames(){
+		return mapMetodoAprendizado.keySet();
+	}
 	public CnfMetodoAprendizado getCNFMetodo(String nome)
 	{
 		return mapMetodoAprendizado.get(nome);

@@ -433,24 +433,25 @@ public class CalculaResultados {
 		MatrizConfusao mcGeral = null;
 		
 		//resgata num de classes se necessario 
-		if(numClasses == null)
+		for(int i = 0; i<arrFolds.length ; i++)
 		{
-			for(int i = 0; i<arrFolds.length ; i++)
+			Iterator<ResultadoItem> j = arrFolds[i].getResultadosValues().iterator();
+			
+			while(j.hasNext())
 			{
-				Iterator<ResultadoItem> j = arrFolds[i].getResultadosValues().iterator();
-				
-				while(j.hasNext())
-				{
-					ResultadoItem ri = j.next();
-					classesNum.add((int)Math.round((ri.getClasseReal())));
-				}
+				ResultadoItem ri = j.next();
+				classesNum.add((int)Math.round((ri.getClasseReal())));
 			}
-			mcGeral = new MatrizConfusao(classesNum.size());
-			numClasses = classesNum.size();
+		}
+		mcGeral = new MatrizConfusao(classesNum.size());
+		numClasses = classesNum.size();
+/*		if(numClasses == null)
+		{
+
 		}else
 		{
 			mcGeral = new MatrizConfusao(numClasses);
-		}
+		}*/
 		
 		
 		 
@@ -463,7 +464,8 @@ public class CalculaResultados {
 		
 		for(int i = 0; i<arrFolds.length ; i++)
 		{
-			strResult.append("================Fold #"+i+"=================");
+			//strResult.append("================Fold #"+i+"=================");
+			//System.out.println("Numero de classes:"+numClasses);
 			MatrizConfusao mc = new MatrizConfusaoCalculos(numClasses);
 			Iterator<ResultadoItem> j = arrFolds[i].getResultadosValues().iterator();
 			
@@ -476,12 +478,12 @@ public class CalculaResultados {
 			numTotalAcuracia += mc.getAcuracia();
 			numMacroF1 += mc.getMacroF1();
 			
-			strResult.append("\n"+mc.toString()+"\n\n");
+			//strResult.append("\n"+mc.toString()+"\n\n");
 		}
 		
-		strResult.append("===Geral===\n"+mcGeral.toString());
-		strResult.append("\n\nMacro F1 médio: "+numMacroF1/arrFolds.length);
-		strResult.append("\nAcurácia média: "+numTotalAcuracia/arrFolds.length);
+		strResult.append("Confusion Matrix\n"+mcGeral.toString());
+		strResult.append("\n\nMacro F1: "+numMacroF1/arrFolds.length);
+		strResult.append("\nAcuracy: "+numTotalAcuracia/arrFolds.length);
 		if(arq != null)
 		{
 			if(!arq.getParentFile().exists())
@@ -490,7 +492,7 @@ public class CalculaResultados {
 			}
 			ArquivoUtil.gravaTexto(strResult.toString(), arq, false);
 			
-			System.out.println("Gravado em:"+arq.toString());
+			System.out.println("Result written:"+arq.toString());
 		}else
 		{
 			System.err.println("Arquivo result não gravado!");
@@ -505,15 +507,16 @@ public class CalculaResultados {
 		String result =  "";
 		
 		//resultado matriz confusao (se existir)
+		/*
 		MatrizConfusao m = r.getMatrizConfusao();
 		if(m!=null)
 		{
 			result += "\n\n***Matriz Confusão**\n"+m.toString();
 		}
-		
+		*/
 		//result por fold geral
-		result = "\n\n\n================================================================";
-		result += "\nExperimento: "+r.getNomExperimento()+"\n";
+		//result = "\n\n\n================================================================";
+		//result += "\nExperimento: "+r.getNomExperimento()+"\n";
 		result += getResultPorFold(r.getFolds(),arqResult,r.getNomExperimento());
 		
 		//result por fold de votacao (se necessario
@@ -558,14 +561,14 @@ public class CalculaResultados {
 		
 		String result = "";
 		
-		result += "\n\n*****FOLDS MSE e Tempo de execução****\n";
+		/*result += "\n\n*****FOLDS MSE e Tempo de execução****\n";
 		//imprime resultado por folds
 		for(int i = 0; i<folds.length ; i++)
 		{
 			result += "#"+i+"\t";
 		}
 		result += "\n";
-		
+		*/
 		//imprime totalizacoes
 		long sumTempo = 0;
 		int totalInstancias = 0;

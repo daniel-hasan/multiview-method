@@ -1,33 +1,38 @@
 featureSetCacheFile = cache_feature_set.obj
 useCache = false
 
-mlToolsPath = ../ml_tools/ 
+#path to the machine learning method tools (this is used in the XML machine learning method scripts - variable xmlMachineLearningMethods)
+mlToolsPath = ml_tools/ 
 
+#Feature id range for each view. 
 view_1_idx_range=1-2
 view_2_idx_range=3-4
 view_3_idx_range=5
 #its similar to:
-#viewPerFeature = 1,1,2,2,3
+#viewPerFeature = 1,1,2,2,3,3
 #In viewPerFeature, use "0" if there is no view assigned to a determined feature
 
-
+#Whether to use all feature set in the second level (together with the predictions)
 withFeatSet = false
+
+#justBaseLevel use a usual machine learning (do not do the multiview, using all features)
 justBaseLevel = false
+
 #output dir result
 outputDir=result
 
 #machine learning type (classification, regression or l2r)
-mlMode = regression
+mlMode = classification
 
 #XML containing the machine learning methods scripts
-xmlMachineLearningMethods = learning_methods.xml
+xmlMachineLearningMethods = MultiviewMethod/learning_methods.xml
 
-#usage the ml name contained in the xml file (xmlMachineLearningMethods)
+#use the ml name contained in the xml file (xmlMachineLearningMethods)
 mlMethod = SVM
 
 #set the parameters of the machine learning method (* to make a gridsearch - according to the XML file) in the training and test set. Use the prefix "ml_param_train_" for the training set params and "ml_pram_test_" for the test params
-ml_param_train_COST = *
-ml_param_train_GAMA = *
+ml_param_train_COST = 2
+ml_param_train_GAMA = 8
 
 
 

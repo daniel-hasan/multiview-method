@@ -44,7 +44,7 @@
 	<method>
 		<name>SVMRank</name>
 		<train>
-			<params>{ARQ_TREINO} {ARQ_MODELO} {ARQ_TESTE} {COST_PER_QUERY}</params>
+			<params>{ARQ_TREINO} {ARQ_MODELO} {ARQ_TESTE} {COST_PER_QUERY} {PATH_TOOLS}</params>
 
 			<param_cnf>
 				<param>
@@ -55,24 +55,19 @@
 			</param_cnf>
 
 			<script>
+				$5/libsvm/svm-scale -l 0 -u 1 -s $1.param $1> $1.scaled
+				$5/libsvm/svm-scale -l 0 -u 1 -r $1.param $3> $3.scaled
 
-				/data/ferramentas/svmrank/scale/scale.sh $1 $3
-				/data/ferramentas/svmrank/svm_rank_learn  -c $4 $1.saida $2
+				$5/svmrank/svm_rank_learn  -c $4 $1.scaled $2
 
-				#java -Xmx800m -jar /data/ferramentas/ranksvm/scale.jar $1 $1.scaled
-				#/data/ferramentas/svmrank/svm_rank_learn -c 1 $1.scaled $2
+
 			</script>
 		</train>
 		<test>
-			<params>{ARQ_TREINO} {ARQ_MODELO} {ARQ_TESTE} {ARQ_RESULTADO}</params>
+			<params>{ARQ_MODELO} {ARQ_TESTE} {ARQ_RESULTADO} {PATH_TOOLS}</params>
 
 			<script>
-				/data/ferramentas/svmrank/svm_rank_classify $3.saida $2 $4
-
-				#java -Xmx800m -jar /data/ferramentas/ranksvm/scale.jar $3 $3.scaled $1.scaled.param
-				#/data/ferramentas/svmrank/svm_rank_classify $3.scaled $2 $4
-
-
+				$4/svmrank/svm_rank_classify $2.scaled $1 $3
 			</script>
 		</test>
 	</method>

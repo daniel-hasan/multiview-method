@@ -1,15 +1,19 @@
 package apredizadoCombinacao;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -19,6 +23,7 @@ import java.util.UUID;
 
 import apredizadoCombinacao.MetaLearning.TIPO_CONTEUDO_DATASET;
 import aprendizadoResultado.CalculaResultados;
+import aprendizadoResultado.ResultadoAnalyser;
 import aprendizadoUtils.FitnessCalculator;
 import aprendizadoUtils.GenericoLetorLike;
 import aprendizadoUtils.GenericoSVMLike;
@@ -406,6 +411,7 @@ public class FeatureSelectionHelper implements Serializable,ViewCreatorHelper
 				
 				arrViews[idxView] = view;		
 				lstResultPorView.add(view.getResultTeste());
+				
 				idxView++;
 				System.out.println("Tempo de execucao da view #"+idxNewView+": "+(System.currentTimeMillis()-subtime)/1000.0);
 			}
@@ -606,7 +612,7 @@ public class FeatureSelectionHelper implements Serializable,ViewCreatorHelper
 
 			MetodoAprendizado metApView = metApAtual;
 			
-
+			/*
 			Map<String,String> mapParam = getParams(metApView,numFeatures);
 			if(metApView instanceof GenericoLetorLike && !FORCE_SVR)
 			{
@@ -617,7 +623,7 @@ public class FeatureSelectionHelper implements Serializable,ViewCreatorHelper
 				//metApView =  getMetodoAprendizadoRegressao(nomMetodo,mapParam);
 				metApView =  metApAtual;
 			}
-			
+			*/
 			return metApView;
 		}
 	 
@@ -1316,10 +1322,47 @@ public class FeatureSelectionHelper implements Serializable,ViewCreatorHelper
 	 public static double getResultadoConfigView(File arqIndexadorFeatHelper,Integer[] arrFiltro,FitnessCalculator fc,boolean featSet,boolean justBase) throws Exception{
 		 return getResultadoConfigView( arqIndexadorFeatHelper, arrFiltro, fc, featSet, justBase, new File("/home/profhasan/wikiTest.out"), ML_MODE.CLASSIFICATION);
 	 }
-	 public static double getResultadoConfigView(File arqIndexadorFeatHelper,Integer[] arrFiltro,FitnessCalculator fc,boolean featSet,boolean justBase,File outputDir, ML_MODE mlMode) throws Exception
+	 
+	 public static void writeResult(GenericoSVMLike mAp,Fold fResult, File arqOrder,File arquivoOutput) throws IOException{
+		 //busca a ordem do arquivo
+		 List<Long> lstIdsOrder = new ArrayList<Long>();
+		 BufferedReader in = new BufferedReader(new FileReader(arqOrder));
+		 String line;
+		 StringBuilder texto = new StringBuilder();
+		 while ((line = in.readLine()) != null)
+			{
+				Integer id = mAp.getIdPorLinhaArquivo(line);
+				//if id==null, put in sortedOrder
+				if(id==null){
+					lstIdsOrder = new ArrayList<Long>(fResult.getIdsResultado());
+					lstIdsOrder.sort(new Comparator<Long>() {
+						@Override
+						public int compare(Long o1, Long o2) {
+							// TODO Auto-generated method stub
+							return o1>o2? 1 : (o1<o2?-1:0);
+						}
+					});
+					break;
+				}
+				lstIdsOrder.add((long)id);
+			}
+			in.close();
+			
+		//com a lista de ids, cria o novo arquivo
+		BufferedWriter out = new BufferedWriter(new FileWriter(arquivoOutput, false));
+		for(Long idList : lstIdsOrder){
+			out.write(fResult.getResultadoPorId(idList).getClassePrevista()+"\n");	
+		}
+		out.close();
+	 }
+	 public static double getResultadoConfigView(File arqIndexadorFeatHelper,Integer[] arrFiltro,FitnessCalculator fc,boolean featSet,boolean justBase,File outputDir, ML_MODE mlMode) throws Exception{
+		 return getResultadoConfigView(arqIndexadorFeatHelper, arrFiltro, fc, featSet, justBase, outputDir,  mlMode, null);
+	 }
+	 public static double getResultadoConfigView(File arqIndexadorFeatHelper,Integer[] arrFiltro,FitnessCalculator fc,boolean featSet,boolean justBase,File outputDir, ML_MODE mlMode,File arqTest) throws Exception
 	 {
 		 long time = System.currentTimeMillis();
 		 FeatureSelectionHelper fr = (FeatureSelectionHelper)ArquivoUtil.leObject(arqIndexadorFeatHelper);
+		 
 		 //fr.printFeaturesVector();
 		 //System.exit(0);
 		 //fr.setMethodName("SVMRank");
@@ -1336,58 +1379,98 @@ public class FeatureSelectionHelper implements Serializable,ViewCreatorHelper
 		if(!outputDir.exists()) {
 			outputDir.mkdirs();
 		}
+		 //verifica a quantidade de classes do resultado
+		 int maxClass = 0;
+		 File[] finalResulPath = new File[r.getFolds().length];
+		 for(int i =0 ; i<r.getFolds().length; i++){
+			 Fold f = r.getFolds()[i];
+			 for(ResultadoItem ri : f.getResultadosValues()){
+				 if(maxClass > ri.getClasseReal()){
+					 maxClass = (int) ri.getClasseReal();
+				 }
+			 }
+			 //move o predict do fold para a pasta de resultado
+			 finalResulPath[i] = new File(outputDir,"final_result.predict");
+			 File arqOrder = arqTest!=null?arqTest:f.getTeste();
+			 writeResult((GenericoSVMLike)fr.getMetodoCombinacao(), f, arqOrder, finalResulPath[i]);
+			 //ArquivoUtil.copyfile(f.getPredict(), finalResulPath[i]); 
+		 }
+		 
 		 switch(mlMode) {
 			 case CLASSIFICATION:
-				 //verifica a quantidade de classes do resultado
-				 int maxClass = 0;
-				 File[] finalResulPath = new File[r.getFolds().length];
-				 for(int i =0 ; i<r.getFolds().length; i++){
-					 Fold f = r.getFolds()[i];
-					 for(ResultadoItem ri : f.getResultadosValues()){
-						 if(maxClass > ri.getClasseReal()){
-							 maxClass = (int) ri.getClasseReal();
-						 }
-					 }
-					 //move o predict do fold para a pasta de resultado
-					 finalResulPath[i] = new File(outputDir,"final_result.predict");
-					 ArquivoUtil.copyfile(f.getPredict(), finalResulPath[i]); 
-				 }
-				 System.out.println("========================= Per view Result ========================");
-				 for(int i = 0 ; i<resultTesteView.length ; i++){
-					 System.out.println("==============================");
-					 System.out.println("VIEW: "+r.getViews()[i].toString());
-					 System.out.println(CalculaResultados.resultadoClassificacaoToString(resultTesteView[i], maxClass, new File(outputDir,"result_"+r.getViews()[i].toString()+".txt")));
-					 //grava predict de cada visao
-					 for(int j = 0; j<resultTesteView[i].getFolds().length ; j++) {
-						 Fold f = resultTesteView[i].getFolds()[j];
-						 File fViewResult = new File(outputDir,"result_"+r.getViews()[i].toString()+".predict");
-						 ArquivoUtil.copyfile(f.getPredict(), fViewResult);  
-						 System.out.println(" predicts output file:"+finalResulPath[i].getAbsolutePath() );
-					 }
-				 }
-				 System.out.println("====================== Final Result ==============================");
-				 System.out.println(CalculaResultados.resultadoClassificacaoToString(r, maxClass, new File(outputDir,"final_result.txt")));
-				 for(int i =0; i<finalResulPath.length; i++) {
-					 System.out.println("Final predicts output file:"+finalResulPath[i].getAbsolutePath() );
-				 }
-				 break;
 			 case REGRESSION:
+
 				 System.out.println("========================= Per view Result ========================");
 				 for(int i = 0 ; i<resultTesteView.length ; i++){
+					 System.out.println("......................................................................");
 					 System.out.println("VIEW: "+r.getViews()[i].toString());
-					 System.out.println(CalculaResultados.resultadoRegressaoToString(resultTesteView[i], new File(outputDir,"result_"+r.getViews()[i].getSglView()+".txt")));
+					 switch(mlMode) {
+					 	case CLASSIFICATION:
+					 		//System.out.println("CLASSIFICCACAO");
+					 		System.out.println(CalculaResultados.resultadoClassificacaoToString(resultTesteView[i], maxClass, new File(outputDir,"result_"+r.getViews()[i].toString()+".txt")));
+					 		break;
+					 	case REGRESSION:
+					 		 //System.out.println("REGRESSAO");
+							 System.out.println(CalculaResultados.resultadoRegressaoToString(resultTesteView[i], new File(outputDir,"result_"+r.getViews()[i].getSglView()+".txt")));
+					 		break;
+					 }
+					 //System.out.println(CalculaResultados.resultadoClassificacaoToString(resultTesteView[i], maxClass, new File(outputDir,"result_"+r.getViews()[i].toString()+".txt")));
+					 write_view_output(i,outputDir, arqTest, fr, r, resultTesteView);
 				 }
 				 
 				 System.out.println("====================== Final Result ==============================");
-				 System.out.println(CalculaResultados.resultadoRegressaoToString(r, new File(outputDir,"result_final.txt")));
+				 switch(mlMode) {
+				 	case CLASSIFICATION:
+				 		System.out.println(CalculaResultados.resultadoClassificacaoToString(r, maxClass, new File(outputDir,"final_result.txt")));
+				 		break;
+				 	case REGRESSION:
+						 System.out.println(CalculaResultados.resultadoRegressaoToString(r, new File(outputDir,"final_result.txt")));
+				 		break;
+				 }
+				 
 				 break;
+			 case L2R:
+				 System.out.println("========================= Per view Result ========================");
+				 for(int i = 0 ; i<resultTesteView.length ; i++){
+					 System.out.println("......................................................................");
+					 System.out.println("VIEW: "+r.getViews()[i].toString());
+					 FitnessCalculator.getResultado(fr.getMetodoCombinacao(), resultTesteView[i],0.0,null);
+					 
+					 //System.out.println(CalculaResultados.resultadoClassificacaoToString(resultTesteView[i], maxClass, new File(outputDir,"result_"+r.getViews()[i].toString()+".txt")));
+					 //grava predict de cada visao
+					 write_view_output(i,outputDir, arqTest, fr, r, resultTesteView);
+					 
+				 }
+				 System.out.println("================ Final Result ==========================");
+				 FitnessCalculator.getResultado(fr.getMetodoCombinacao(), r,0.0,null);
+
 		 }
-		//grava resultados no output
-		
-		return FitnessCalculator.getResultado(fr.getMetodoCombinacao(), r,0.0,null);
+		 
+		 for(int i =0; i<finalResulPath.length; i++) {
+			 
+			 System.out.println("Final predicts output file:"+finalResulPath[i].getAbsolutePath() );
+		 }		
+		return 0;
 		 
 		 
 	 }
+	private static void write_view_output(int i,File outputDir, File arqTest, FeatureSelectionHelper fr, Resultado r,
+			Resultado[] resultTesteView) throws IOException {
+		
+			 for(int j = 0; j<resultTesteView[i].getFolds().length ; j++) {
+				 Fold f = resultTesteView[i].getFolds()[j];
+				 File fViewResult = new File(outputDir,"result_"+r.getViews()[i].toString()+".predict");
+				 
+				 //grava reusltado
+				 File arqOrder = arqTest!=null?arqTest:f.getTeste();	 
+				 writeResult((GenericoSVMLike)fr.getMetodoViews(), f, arqOrder, fViewResult);
+				 
+				 //ArquivoUtil.copyfile(f.getPredict(), fViewResult);  
+				 System.out.println(" predicts output file:"+fViewResult.getAbsolutePath() );
+			 }
+			 
+		 
+	}
 	 public static MetodoAprendizado getMetodoApredizadoL2R(String nomMetodo,Map<String,String> mapParam) throws Exception
 	 {
 		mapParam.put("RANKER", "8");

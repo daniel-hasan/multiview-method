@@ -342,7 +342,7 @@ public class MatrizConfusao implements Serializable
     {
     	
     	StringBuilder strBuilder = new StringBuilder();
-    	strBuilder.append("Classe real (linhas) classe prevista (colunas):\n");
+    	strBuilder.append("Target Class (lines) Predicted Class (columns):\n");
     	for(int i =0 ; i<matriz.length ; i++)
         {
     		strBuilder.append("\t"+getClassName(i));
@@ -359,7 +359,7 @@ public class MatrizConfusao implements Serializable
             strBuilder.append("\n");
         }
         strBuilder.append("\n");
-        strBuilder.append("Acertos: "+this.numAcertos+"/"+this.numPredicoes+" ("+((this.numAcertos/(double)this.numPredicoes)*100.0)+"%)\n");
+        strBuilder.append("Hits: "+this.numAcertos+"/"+this.numPredicoes+" ("+((this.numAcertos/(double)this.numPredicoes)*100.0)+"%)\n");
         strBuilder.append("Macro F1: "+getMacroF1()+"\nMacro F1 per class:"+getMacroPerClass());
         return strBuilder.toString();
     }

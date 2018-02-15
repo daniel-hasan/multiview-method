@@ -715,7 +715,7 @@ private static MetodoAprendizado chooseMetodoToUse(MetodoAprendizado metAp,
 		//dados do fold novo
 		
 		int foldNum = resultPorViewTreino[0].getNum();
-		System.err.println("FOLD NUM : "+foldNum);
+		//System.oit.println("FOLD NUM : "+foldNum);
 		
 		String nomeBaseArquivo = getDirMetalearning().getAbsolutePath()+"/"+this.getSiglaColecao();
 		

@@ -46,7 +46,7 @@ public class FitnessCalculator {
 		{
 			minClasse = getMinClass(result);
 		}
-		System.out.println("MIN CLASSE: "+minClasse);
+		//System.out.println("MIN CLASSE: "+minClasse);
 		
 		Integer k = 1; 
 		MetricaUsada metrica = null;
@@ -69,36 +69,29 @@ public class FitnessCalculator {
 		//metrica = MetricaUsada.NDCG_EXP;
 		//k=10;
 		double dblresult = 0;
-		for(int kVal= 1 ; kVal<=k ; kVal++)
-		{
-			switch(metrica)
+		if(metrica == MetricaUsada.NDCG_EXP || metrica == MetricaUsada.NDCG){
+			for(int kVal= 1 ; kVal<=k ; kVal++)
 			{
-				case NDCG_EXP:
-				case NDCG:
-					System.out.println("\nNDCG@"+kVal+":");
-					break;
-				case MSE:
-					System.out.println("\nMSE por Fold:");
-					break;
-				case ACURACIA:
-					System.out.println("\nAcuracia por Fold:");
-					break;
-			}
-			
-			ValorResultadoMultiplo vrMult = metCombinacao.getResultadoPorIteracao(result.getFolds(), metrica, kVal, minClasse,resAnal);
-			double sum = 0;
-			for(double resultFold : vrMult.getAllResults())
-			{
-				System.out.println("==> "+resultFold);
-				sum += resultFold;
-			}
-			System.out.println("Avg: "+sum/vrMult.getAllResults().size());
-			if(kVal == k)
-			{
-				dblresult = vrMult.getAvgResults();
+	
+	
+				
+				ValorResultadoMultiplo vrMult = metCombinacao.getResultadoPorIteracao(result.getFolds(), metrica, kVal, minClasse,resAnal);
+				double sum = 0;
+				for(double resultFold : vrMult.getAllResults())
+				{
+					//System.out.println("==> "+resultFold);
+					sum += resultFold;
+				}
+				System.out.println("\nNDCG@"+kVal+":"+sum/vrMult.getAllResults().size());
+				//System.out.println("Avg: "+sum/vrMult.getAllResults().size());
+
+				if(kVal == k)
+				{
+					dblresult = vrMult.getAvgResults();
+				}
+
 			}
 		}
-		
 
 		return dblresult;
 	}

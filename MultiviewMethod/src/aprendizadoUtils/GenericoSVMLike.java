@@ -1,7 +1,5 @@
 package aprendizadoUtils;
 
-import io.Sys;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -12,18 +10,18 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 
-import string.StringUtil;
-import stuctUtil.ListaAssociativa;
-import stuctUtil.Tupla;
-import utilAprendizado.params.ParamUtil;
-import aprendizadoResultado.ValorResultado;
 import entidadesAprendizado.CnfMetodoAprendizado;
 import entidadesAprendizado.Fold;
 import entidadesAprendizado.Param;
 import entidadesAprendizado.ResultadoItem;
 import entidadesAprendizado.XMLMetodoAprendizado;
+import io.Sys;
+import string.StringUtil;
+import stuctUtil.Tupla;
+import utilAprendizado.params.ParamUtil;
 
 public class GenericoSVMLike extends SVM
 {
@@ -73,6 +71,11 @@ public class GenericoSVMLike extends SVM
 			xmlMetodoCnf = new XMLMetodoAprendizado(new File(DIR_CNF_METODOS+"/metodo_aprendizado.xml"));
 		}
 		cnfMetodo = xmlMetodoCnf.getCNFMetodo(nomeMetodo);
+		if(cnfMetodo == null){
+			
+			System.err.println("Could not find the method name: "+nomeMetodo+" in the XML. Valid names are:  "+xmlMetodoCnf.getCNFMetodoNames());
+			System.exit(0);
+		}
 		boolean isClassificacao = false;
 		if(mapParamTeste != null && mapParamTeste.containsKey("SVM_TYPE"))
 		{
@@ -259,7 +262,7 @@ public class GenericoSVMLike extends SVM
 		{
 			ArrayList<ResultadoItem> lstResultFold = super.testar(fold);
 			String strResultLine = "Resultado do fold: "+this.getResultado(lstResultFold);
-			System.out.println(strResultLine);
+			//System.out.println(strResultLine);
 			saidaTeste += "\n"+strResultLine;
 			
 			return this.bolEndedWithTimeout?new ArrayList<ResultadoItem>(): lstResultFold;
@@ -359,7 +362,7 @@ public class GenericoSVMLike extends SVM
 			
 			strParamComplete += strParam;
 		}
-		System.out.println("PARAMS: "+strParamComplete);
+		//System.out.println("PARAMS: "+strParamComplete);
 		return strParamComplete;
 	}
 	public void setDirExecucaoComando(String dir)
@@ -385,7 +388,10 @@ public class GenericoSVMLike extends SVM
 	public File testar(Fold fold, String nomeBase, String treino,String teste, String pathDiretorio) throws IOException {
 		String resp;
 		bolEndedWithTimeout = false;
-		String resultFile = pathDiretorio+"/"+nomeBase+".predict"+fold.getNum();
+		
+		
+		String nomeResult = UUID.randomUUID().toString();
+		String resultFile = pathDiretorio+"/result_"+nomeResult+".predict"+fold.getNum();
 		File arqPredict = new File(resultFile);
 		boolean existe = arqPredict.exists();
 		String saidaErro = "";
