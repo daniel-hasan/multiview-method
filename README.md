@@ -2,9 +2,8 @@
 
 This is the machine learning method implemented for the [article](http://onlinelibrary.wiley.com/doi/10.1002/asi.23650/full): 
 
-```
-Dalip, Daniel Hasan, Gonçalves, Marcos A., Cristo, Marco, & Calado, Pavel (2017). **A general multiview framework for assessing the quality of collaboratively created content on web 2.0**. Journal of the Association for Information Science and Technology, 68(2), 286-308.
-```
+> Dalip, Daniel Hasan, Gonçalves, Marcos A., Cristo, Marco, & Calado, Pavel (2017). **A general multiview framework for assessing the quality of collaboratively created content on web 2.0**. Journal of the Association for Information Science and Technology, 68(2), 286-308.
+
 
 This software is compatible with Linux only.
 
