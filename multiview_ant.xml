@@ -4,7 +4,7 @@
     <!--ANT 1.7 is required                                        -->
     <!--define folder properties-->
     <property name="dir.buildfile" value="."/>
-    <property name="dir.workspace" value="/home/hasan/workspace"/>
+    <property name="dir.workspace" value="."/>
     <property name="dir.jarfile" value="${dir.buildfile}"/>
     <target name="create_run_jar">
         <jar destfile="${dir.jarfile}/multiview.jar" filesetmanifest="mergewithoutmain">
@@ -12,7 +12,7 @@
                 <attribute name="Main-Class" value="main.CriaObjToEvalPerDataset"/>
                 <attribute name="Class-Path" value="."/>
             </manifest>
-            <fileset dir="${dir.jarfile}/bin"/>
+            <fileset dir="${dir.jarfile}/MultiviewMethod/bin"/>
             <zipfileset excludes="META-INF/*.SF" src="${dir.jarfile}/libs/xerces-2_6_2.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="${dir.jarfile}/libs/commons-math-1.2.jar"/>
         </jar>
