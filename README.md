@@ -17,7 +17,7 @@ First, prepare a training and testing dataset in libsvm the format:
 <class> <id_feature_1>:<val_feature_1> <id_feature_2>:<val_feature_2> ... <id_feature_n>:<val_feature_n>
 ```
 
-where <class> is the target class <id_feature_i> is the ith feature id (starting with 1) and <val_feature_i> is the ith feature value. After that, configure the multiview method setting the config variables (you can change the default parameters in the `configExample.cnf` or `configExample_l2r.cnf`). Also in this file you will assign the view for each feature. For more information, see `.cnf` file comments. To run this program, use: 
+where `<class>` is the target class `<id_feature_i>` is the ith feature id (starting with 1) and `<val_feature_i>` is the ith feature value. After that, configure the multiview method setting the config variables (you can change the default parameters in the [configExample.cnf](configExample.cnf) or [configExample_l2r.cnf](configExample_l2r.cnf)). Also in this file you will assign the view for each feature. For more information, see `.cnf` file comments. To run this program, use: 
 
 ```
 java -jar multiview.jar <train-file> <test-file> <config-file>
