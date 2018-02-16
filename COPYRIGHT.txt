@@ -3,6 +3,9 @@ Multiview Method Copyright
 
 Available at https://github.com/daniel-hasan/multiview-method
 
+This is the machine learning method implemented for the article:
+        Dalip, Daniel Hasan, Gonçalves, Marcos A., Cristo, Marco, & Calado, Pavel (2017). A general multiview framework for assessing the quality of collaboratively created content on web 2.0. Journal of the Association for Information Science and Technology, 68(2), 286-308.
+
 Authors: 
 	Daniel Hasan Dalip
 	hasan@decom.cefetmg.br
@@ -14,7 +17,9 @@ Authors:
 	Brazil
 
 	Marcos André Gonçalves, Marco Cristo, Pável Calado
-
+	
+	
+	
 Copyright (c) Daniel Hasan Dalip, Marcos André Gonçalves, Marco Cristo and Pável Calado
 All rights reserved.
 
