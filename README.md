@@ -11,7 +11,7 @@ This software is compatible with Linux only.
 
 
 
-First, prepare a training and testing dataset in libsvm the format: 
+First, prepare a training and testing dataset in libsvm the format (examples in folder [toyExample](toyExample)): 
 
 ```
 <class> <id_feature_1>:<val_feature_1> <id_feature_2>:<val_feature_2> ... <id_feature_n>:<val_feature_n>
