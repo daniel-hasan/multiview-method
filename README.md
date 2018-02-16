@@ -31,6 +31,11 @@ java -jar multiview.jar toyExample/train_svm.txt toyExample/test_svm.txt configE
 
 The source code is available at the `MultiviewMethod` folder. Note that you can use different methods by changing the XML [MultiviewMethod/learning_methods.xml](MultiviewMethod/learning_methods.xml) and creating their scripts. Regarding Learning to Rank method, we used the SVM-RANK library available at: [https://www.cs.cornell.edu/peopl](https://www.cs.cornell.edu/peopl). Use the same format as SVM-RANK in case of L2R problems.
 
+In case of having problems to run the jar, you may want to recompile it:
+```
+ant -buildfile multiview_ant.xml
+```
+
 
 
 ## Quality Assessment Method Datasets and Results
