@@ -65,17 +65,12 @@ public class GenericoSVMLike extends SVM
 	}
 	public GenericoSVMLike(String nomeMetodo,Map<String,String> mapParamTreino,Map<String,String> mapParamTeste) throws Exception
 	{
-		this.nomeMetodo = nomeMetodo;
 		if(xmlMetodoCnf == null)
 		{
 			xmlMetodoCnf = new XMLMetodoAprendizado(new File(DIR_CNF_METODOS+"/metodo_aprendizado.xml"));
 		}
-		cnfMetodo = xmlMetodoCnf.getCNFMetodo(nomeMetodo);
-		if(cnfMetodo == null){
-			
-			System.err.println("Could not find the method name: "+nomeMetodo+" in the XML. Valid names are:  "+xmlMetodoCnf.getCNFMetodoNames());
-			System.exit(0);
-		}
+		
+		setMethodName(nomeMetodo);
 		boolean isClassificacao = false;
 		if(mapParamTeste != null && mapParamTeste.containsKey("SVM_TYPE"))
 		{
@@ -105,6 +100,29 @@ public class GenericoSVMLike extends SVM
 			this.setMode(SVM.MODE_CLASSIFICATION);
 			isClassificacao = true;
 		}
+		setDefaultParams(mapParamTreino, mapParamTeste, isClassificacao);
+		
+		createTrainTestScripts();
+		
+		this.mapParamTreino = mapParamTreino;
+		this.mapParamTeste  = mapParamTeste;
+		
+
+		
+		//transforma parametros em string
+		resetParams(mapParamTreino, mapParamTeste);
+	}
+	public void setMethodName(String nomeMetodo) {
+		this.nomeMetodo = nomeMetodo;		
+		cnfMetodo = xmlMetodoCnf.getCNFMetodo(nomeMetodo);
+		if(cnfMetodo == null){
+			
+			throw new RuntimeException("Could not find the method name: "+nomeMetodo+" in the XML. Valid names are:  "+xmlMetodoCnf.getCNFMetodoNames());
+			//System.exit(0);
+		}
+	}
+	private void setDefaultParams(Map<String, String> mapParamTreino, Map<String, String> mapParamTeste,
+			boolean isClassificacao) {
 		//System.out.println("oioi");
 		String strModeVal = "";
 		if(isClassificacao)
@@ -132,16 +150,6 @@ public class GenericoSVMLike extends SVM
 			//o valor do modo caso a classificacao for = 1 é 0
 			mapParamTreino.put("IS_CLASSIFICACAO", strModeVal);
 		}
-		
-		createTrainTestScripts();
-		
-		this.mapParamTreino = mapParamTreino;
-		this.mapParamTeste  = mapParamTeste;
-		
-
-		
-		//transforma parametros em string
-		resetParams(mapParamTreino, mapParamTeste);
 	}
 	private void resetParams(Map<String, String> mapParamTreino,
 			Map<String, String> mapParamTeste) throws Exception {
@@ -295,7 +303,17 @@ public class GenericoSVMLike extends SVM
 		this.mapParamTreino.put(key, val);
 		this.resetParams(this.mapParamTreino, this.mapParamTeste);
 	}
-
+	public void setParamTest(String key,String val) throws Exception
+	{
+		this.mapParamTreino.put(key, val);
+		this.resetParams(this.mapParamTreino, this.mapParamTeste);
+	}
+	public void clearAllParams() throws Exception {
+		this.mapParamTreino.clear();
+		this.mapParamTeste.clear();
+		setDefaultParams(mapParamTreino, mapParamTeste, this.isClassificacao());
+		this.resetParams(this.mapParamTreino, this.mapParamTeste);
+	}
 	private Tupla<Map<String, String>, Map<String, String>> getBestParam(String nomeMetodo, Map<String, String> mapParamTreino,	Map<String, String> mapParamTeste,File arquivo,Fold[] arrFoldTesteParam) throws Exception {
 		
 		

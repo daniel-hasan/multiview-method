@@ -40,7 +40,44 @@
 			</script>
 		</test>
 	</method>
+	<method>
+		<name>SVMLinear</name>
+		<train>
+			<params>{GENERATE_PROBABILITIES} {EPSLON} {SVM_TYPE} {COST} {ARQ_TREINO} {ARQ_MODELO} {PATH_TOOLS}</params>
+			<param_cnf>
+				<param>
+					<name>EPSLON</name><default>0.1</default><variation value_pos="2^i">-3 -- -1</variation>
+				</param>
+				<param>
+					<name>GENERATE_PROBABILITIES</name><default>0</default><variation>0;1</variation>
+				</param>
+				<param>
+					<name>COST</name><default>1</default><variation value_pos="2^i" step="2">-5 -- 5</variation>
+				</param>
+				<param>
+					<name>SVM_TYPE</name><default>0</default><variation>0;1;2;3;4</variation>
+				</param>
+			</param_cnf>
+    		<script>
+				$7/libsvm/svm-scale -l 0 -u 1 -s $5.param $5> $5.scaled
+				$7/libsvm/svm-train -t 0 -b $1 -p $2 -s $3 -c $4 "$5.scaled" "$6"
+			</script>
+		</train>
+		<test>
+			<params>{GENERATE_PROBABILITIES} {ARQ_TESTE} {ARQ_MODELO} {ARQ_RESULTADO} {ARQ_TREINO} {PATH_TOOLS}</params>
+			<param_cnf>
+				<param>
+					<name>GERAR_CONFIANCA</name><default>0</default><variation>0;1</variation>
+				</param>
+			</param_cnf>
 
+
+			<script>
+				$6/libsvm/svm-scale -l 0 -u 1 -r $5.param $2> $2.scaled
+				$6/libsvm/svm-predict -b $1 "$2.scaled" "$3" $4
+			</script>
+		</test>
+	</method>
 	<method>
 		<name>SVMRank</name>
 		<train>

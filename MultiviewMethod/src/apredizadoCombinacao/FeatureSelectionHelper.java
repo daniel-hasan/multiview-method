@@ -10,6 +10,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
+import java.lang.reflect.MalformedParametersException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -349,6 +350,25 @@ public class FeatureSelectionHelper implements Serializable,ViewCreatorHelper
 			System.out.println("}");
 		}
 	}
+	public Resultado retornaFoldsFiltrado(Integer[] arrFiltro) throws Exception{
+		Set<Integer> idxViews = new HashSet<Integer>();
+		for(int viewIdx : arrFiltro) {
+			idxViews.add(viewIdx);
+		}
+		//MetodoAprendizado metAp = getMetodoAprendizado(methodViewName,metApViewAtual,lstFeatures.size());
+		
+		GenericoSVMLike gSVM = (GenericoSVMLike) this.metApCombinacao;
+		Map<Integer,String> mapMethodPerView = new HashMap<Integer,String>();
+		Map<Integer,Map<String,String>> mapParamsViewTreino = new HashMap<Integer,Map<String,String>>(); 
+		Map<Integer,Map<String,String>> mapParamsViewTeste = new HashMap<Integer,Map<String,String>>(); 
+		for(int idxView: idxViews) {
+			mapParamsViewTreino.put(idxView, gSVM.getParamTrain());
+			mapParamsViewTeste.put(idxView, gSVM.getParamTest());
+			mapMethodPerView.put(idxView, gSVM.getNomeMetodo());
+		}
+		return retornaFoldsFiltrado(arrFiltro,gSVM.getParamTrain(),gSVM.getParamTest(),
+									mapParamsViewTreino,mapParamsViewTeste,mapMethodPerView);
+	}
 		/**
 		 * Dado um array de inteiros com o filtro, retorna folds com os ids de features a ser filtrado
 		 * Assume-se que as features ja foram extraidas e indexadas
@@ -356,7 +376,9 @@ public class FeatureSelectionHelper implements Serializable,ViewCreatorHelper
 		 * @return
 		 * @throws Exception 
 		 */
-		public Resultado retornaFoldsFiltrado(Integer[] arrFiltro) throws Exception
+		public Resultado retornaFoldsFiltrado(Integer[] arrFiltro,
+				Map<String,String> mapTrainParamMultiview, Map<String,String> mapTestParamMultiview,
+				Map<Integer,Map<String,String>> mapTrainParamPerView, Map<Integer,Map<String,String>> mapTestParamPerView,Map<Integer,String> methodPerView) throws Exception
 		{
 			/*
 			printInstancesPerFold("Teste",this.instancesTestPerFold);
@@ -386,16 +408,12 @@ public class FeatureSelectionHelper implements Serializable,ViewCreatorHelper
 			String methodViewName= this.methodName;
 			for(int idxNewView : mapViewsFeatSet.keySet())
 			{
+				System.out.println("--------------------- View #"+idxNewView+" ----------------------");
 				metApViewAtual = this.arrMetApViews == null?this.metApViews:this.arrMetApViews[idxNewView-1];
 				long subtime = System.currentTimeMillis();
 				List<Integer> lstFeatures = mapViewsFeatSet.getList(idxNewView);
+			
 				
-				if(metApViewAtual instanceof GenericoSVMLike)
-				{
-					((GenericoSVMLike) metApViewAtual).setGravarNoBanco(false);
-					((GenericoSVMLike) metApViewAtual).createTrainTestScripts();
-					methodViewName =((GenericoSVMLike) metApViewAtual).getNomeMetodo(); 
-				}
 				lstIdxAllFeatures.addAll(lstFeatures);
 				
 				/**
@@ -403,6 +421,21 @@ public class FeatureSelectionHelper implements Serializable,ViewCreatorHelper
 				 */
 				MetodoAprendizado metApView = getMetodoAprendizado(methodViewName,metApViewAtual,lstFeatures.size());
 				Collections.sort(lstFeatures);
+				
+				/** Define os parametros especificos desta visao **/
+				Map<String,String> mapTreino = mapTrainParamPerView.get(idxNewView);
+				Map<String,String> mapTeste = mapTestParamPerView.get(idxNewView);
+				methodViewName = this.methodName;
+				if(methodPerView.containsKey(idxNewView)) {
+					methodViewName = methodPerView.get(idxNewView);
+				}
+				setMethodParams(metApView, mapTreino, mapTeste,methodViewName);
+				if(metApViewAtual instanceof GenericoSVMLike)
+				{
+					((GenericoSVMLike) metApViewAtual).setGravarNoBanco(false);
+					((GenericoSVMLike) metApViewAtual).createTrainTestScripts();
+					methodViewName =((GenericoSVMLike) metApViewAtual).getNomeMetodo(); 
+				}
 				
 				/** Cria visao **/
 				ArtificialView view = new ArtificialView(this.getNomArquivo(),idxNewView,dirViews,null, metApView, lstFeatures, FeatureType.ARR_GENERIC_VIEW[idxNewView-1],this.minClasse);
@@ -419,6 +452,7 @@ public class FeatureSelectionHelper implements Serializable,ViewCreatorHelper
 			
 			if(!runJustBase)
 			{
+				System.out.println("--------------------- Metalearning ----------------------");
 				//imprime metodos por visao
 				if(this.arrMetApViews != null)
 				{
@@ -448,8 +482,12 @@ public class FeatureSelectionHelper implements Serializable,ViewCreatorHelper
 					arrTipos[0] = TIPO_CONTEUDO_DATASET.FEATURES_SET;
 					
 				}
-				
+				String methodName = this.methodName;
+				if(this.metApCombinacao instanceof GenericoSVMLike) {
+					methodName = ((GenericoSVMLike) (this.metApCombinacao)).getNomeMetodo();
+				}
 				MetodoAprendizado metApCombinacao = getMetodoAprendizado(this.methodName,this.metApCombinacao,mapViewsFeatSet.keySet().size());
+				setMethodParams(metApCombinacao, mapTrainParamMultiview, mapTestParamMultiview,methodName);
 				if(metApCombinacao instanceof GenericoSVMLike)
 				{
 					((GenericoSVMLike) metApCombinacao).setGravarNoBanco(false);
@@ -483,6 +521,26 @@ public class FeatureSelectionHelper implements Serializable,ViewCreatorHelper
 				return arrViews[0].getResultTeste();
 			}
 			
+		}
+		private void setMethodParams(MetodoAprendizado metApView, Map<String, String> mapTreino,
+				Map<String, String> mapTeste,String nomMethod) throws Exception {
+			if(metApView instanceof GenericoSVMLike) {
+				
+				
+				GenericoSVMLike genSVM = (GenericoSVMLike) metApView;
+				genSVM.setMethodName(nomMethod);
+				genSVM.clearAllParams();
+				if(mapTreino != null) {
+					for(String key : mapTreino.keySet()) {
+						genSVM.setParamTrain(key,mapTreino.get(key));
+					}
+				}
+				if(mapTeste != null) {
+					for(String key : mapTeste.keySet()) {
+						genSVM.setParamTrain(key,mapTeste.get(key));
+					}
+				}
+			}
 		}
 		
 		public Fold[][] createFoldsViews(Integer[] arrFiltro) throws Exception
@@ -1356,9 +1414,16 @@ public class FeatureSelectionHelper implements Serializable,ViewCreatorHelper
 		out.close();
 	 }
 	 public static double getResultadoConfigView(File arqIndexadorFeatHelper,Integer[] arrFiltro,FitnessCalculator fc,boolean featSet,boolean justBase,File outputDir, ML_MODE mlMode) throws Exception{
-		 return getResultadoConfigView(arqIndexadorFeatHelper, arrFiltro, fc, featSet, justBase, outputDir,  mlMode, null);
+		 return getResultadoConfigView(arqIndexadorFeatHelper, arrFiltro, fc, featSet, justBase, outputDir,  mlMode, null,null,null,null,null,null);
 	 }
-	 public static double getResultadoConfigView(File arqIndexadorFeatHelper,Integer[] arrFiltro,FitnessCalculator fc,boolean featSet,boolean justBase,File outputDir, ML_MODE mlMode,File arqTest) throws Exception
+	 public static double getResultadoConfigView(File arqIndexadorFeatHelper,Integer[] arrFiltro,FitnessCalculator fc,boolean featSet,boolean justBase,File outputDir, ML_MODE mlMode,
+			 File arqTest) throws Exception {
+		 return getResultadoConfigView(arqIndexadorFeatHelper, arrFiltro, fc, featSet, justBase, outputDir,  mlMode, arqTest,null,null,null,null,null);
+	 }
+	 public static double getResultadoConfigView(File arqIndexadorFeatHelper,Integer[] arrFiltro,FitnessCalculator fc,boolean featSet,boolean justBase,File outputDir, ML_MODE mlMode,
+			 File arqTest,Map<String,String> mapTrainParamMultiview, Map<String,String> mapTestParamMultiview,
+				Map<Integer,Map<String,String>> mapTrainParamPerView, Map<Integer,Map<String,String>> mapTestParamPerView,
+				Map<Integer,String> methodPerView) throws Exception
 	 {
 		 long time = System.currentTimeMillis();
 		 FeatureSelectionHelper fr = (FeatureSelectionHelper)ArquivoUtil.leObject(arqIndexadorFeatHelper);
@@ -1371,7 +1436,9 @@ public class FeatureSelectionHelper implements Serializable,ViewCreatorHelper
 		 fr.setMetaLearningWithFeatSet(featSet);
 		 fr.setRunJustBase(justBase);
 		 
-		 Resultado r = fr.retornaFoldsFiltrado(arrFiltro);
+		 Resultado r = mapTrainParamMultiview==null?fr.retornaFoldsFiltrado(arrFiltro):fr.retornaFoldsFiltrado(arrFiltro,mapTrainParamMultiview,mapTestParamMultiview,
+				 																													mapTrainParamPerView,mapTestParamPerView,
+				 																													methodPerView);
 		 Resultado[] resultTesteView =  new Resultado[r.getViews().length];
 		for(int i = 0; i<r.getViews().length ; i++){
 			resultTesteView[i] = r.getViews()[i].getResultTeste();

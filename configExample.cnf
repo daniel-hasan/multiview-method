@@ -2,7 +2,7 @@ featureSetCacheFile = cache_feature_set.obj
 useCache = false
 
 #path to the machine learning method tools (this is used in the XML machine learning method scripts - variable xmlMachineLearningMethods)
-mlToolsPath = ml_tools/ 
+mlToolsPath = ../ml_tools/ 
 
 #Feature id range for each view. 
 view_1_idx_range=1-2
@@ -25,12 +25,22 @@ outputDir=result
 mlMode = classification
 
 #XML containing the machine learning methods scripts
-xmlMachineLearningMethods = MultiviewMethod/learning_methods.xml
+xmlMachineLearningMethods = learning_methods.xml
 
-#use the ml name contained in the xml file (xmlMachineLearningMethods)
+#multiview machine learning method . Use the ml name contained in the xml file (xmlMachineLearningMethods)
 mlMethod = SVM
 
-#set the parameters of the machine learning method (* to make a gridsearch - according to the XML file) in the training and test set. Use the prefix "ml_param_train_" for the training set params and "ml_pram_test_" for the test params
+#machine learning method per view. If not provided, it will be used the mlMethod as default. Use the ml name contained in the xml file (xmlMachineLearningMethods) 
+mlMethod_view_1 = SVMLinear
+mlMethod_view_2 = SVMLinear
+
+#set the parameters per view (use * to make a gridsearch - according to the XML file) in the training and test set. Use the prefix "ml_param_view_X_train_" for the training set params for the view X and "ml_param_view_X_test_" for the test params of the view X
+ml_param_view_1_train_COST = 0.5
+ml_param_view_2_train_COST = 8
+ml_param_view_3_train_COST = 0.5
+ml_param_view_3_train_GAMA = 2
+
+#set the parameters of the machine learning method used for the multiview - similar than the machine learning method per view
 ml_param_train_COST = 2
 ml_param_train_GAMA = 8
 
