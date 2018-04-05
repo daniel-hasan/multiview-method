@@ -2,7 +2,7 @@ featureSetCacheFile = cache_feature_set.obj
 useCache = false
 
 #path to the machine learning method tools (this is used in the XML machine learning method scripts - variable xmlMachineLearningMethods)
-mlToolsPath = ../ml_tools/ 
+mlToolsPath = ml_tools/ 
 
 #Feature id range for each view. 
 view_1_idx_range=1-2
