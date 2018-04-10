@@ -282,7 +282,7 @@ class Worker(Thread):
 			cmdline += ' -c {0} '.format(c)
 		if options.grid_with_g: 
 			cmdline += ' -g {0} '.format(g)
-		cmdline += ' -v {0} {1} {2} '.format\
+		cmdline += ' -s 3 -v {0} {1} {2} '.format\
 			(options.fold,options.pass_through_string,options.dataset_pathname)
 		return cmdline
 		
@@ -339,7 +339,7 @@ class TelnetWorker(Worker):
 def find_parameters(dataset_pathname, options=''):
 	
 	def update_param(c,g,rate,best_c,best_g,best_rate,worker,resumed):
-		if (rate > best_rate) or (rate==best_rate and g==best_g and c<best_c):
+		if (rate < best_rate) or (rate==best_rate and g==best_g and c<best_c):
 			best_rate,best_c,best_g = rate,c,g
 		stdout_str = '[{0}] {1} {2} (best '.format\
 			(worker,' '.join(str(x) for x in [c,g] if x is not None),rate)
